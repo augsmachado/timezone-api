@@ -1,0 +1,10 @@
+Abidjan:
+    latitude: 5.31667
+    longitude: -4.03333
+    utc_offset: 0
+    dst: false
+Accra:
+    latitude: 5.60389
+    longitude: -0.18778
+    utc_offset: 0
+    dst: false
