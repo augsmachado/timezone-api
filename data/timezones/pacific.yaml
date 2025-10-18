@@ -84,13 +84,13 @@ Kanton:
     utc_offset: -11
     dst: false
 Kiritimati:
-    latitude: 1.8709
-    longitude: -157.3630
+    latitude: 1.8745
+    longitude: -157.4017
     utc_offset: 14
     dst: false
 Kiribati:
-    latitude: 1.8709
-    longitude: -157.3630
+    latitude: 1.9862
+    longitude: -157.3480
     utc_offset: 14
     dst: false
 Kosrae:

@@ -711,7 +711,7 @@ St_Barthelemy:
 St_Johns:
     latitude: 47.5615
     longitude: -52.7126
-    utc_offset: -3:30
+    utc_offset: -3.5
     dst: true
 St_Kitts:
     latitude: 17.3578
@@ -811,7 +811,7 @@ Fernando_de_Noronha:
 Newfoundland:
     latitude: 47.5615
     longitude: -52.7126
-    utc_offset: -3:30
+    utc_offset: -3.5
     dst: true
 Saskatchewan:
     latitude: 50.4452

@@ -1,16 +1,18 @@
 import yaml
-
 from pathlib import Path
-from math import radians, sin, cos, sqrt, atan2, degrees
 
-# Carrega todos os arquivos de timezones em uma lista única e ordenada por
-# latitude, depois longitude
 def load_all_timezones():
-    tz_dir = Path(__file__).parent / "timezones"
+    """
+    Loads all timezone YAML files from the 'data/timezones' directory,
+    returning a single sorted list of city/timezone dictionaries.
+    Each YAML file should represent a region and contain cities as keys.
+    """
+    # Adjust the path to point to the data/timezones directory
+    tz_dir = Path(__file__).parent.parent / "data" / "timezones"
     all_timezones = []
     for file in tz_dir.glob("*.yaml"):
         region = file.stem.lower()
-        with open(file, "r") as f:
+        with open(file, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
             all_timezones.extend(
                 {
@@ -23,12 +25,14 @@ def load_all_timezones():
                 }
                 for name, info in data.items()
             )
-    # Ordena por latitude, depois longitude
-    all_timezones.sort(key=lambda x: (x["latitude"], x["longitude"]))
+    # Global sorted list for efficient lookups
+    # Sort by utc_offset, then longitude, then latitude
+    all_timezones.sort(key=lambda x: (
+        float(x["utc_offset"]) if x["utc_offset"] is not None else 0.0,
+        x["longitude"],
+        x["latitude"]
+    ))
     return all_timezones
-
-# Lista global ordenada para buscas eficientes
-ALL_TIMEZONES = load_all_timezones()
 
 TZ_LOCATIONS = dict(
     sorted(
@@ -97,13 +101,3 @@ TZ_LOCATIONS = dict(
         key=lambda item: item[1]["min_longitude"]
     )
 )
-
-def haversine(lat1, lon1, lat2, lon2):
-    # Calcula a distância entre dois pontos na Terra (em km)
-    R = 6371.0  # raio médio da Terra em km
-    dlat = radians(lat2 - lat1)
-    dlon = radians(lon2 - lon1)
-    a = sin(dlat/2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon/2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    return R * c
-
