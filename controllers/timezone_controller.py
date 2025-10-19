@@ -6,6 +6,22 @@ from utils.geo import haversine
 
 
 ALL_TIMEZONES = load_all_timezones()
+
+def validate_lat_lon(latitude, longitude):
+    if not isinstance(latitude, (int, float)) or not isinstance(longitude, (int, float)):
+        raise TypeError("Latitude and longitude must be numeric.")
+    if not (-90 <= latitude <= 90):
+        raise ValueError("Latitude must be between -90 and 90.")
+    if not (-180 <= longitude <= 180):
+        raise ValueError("Longitude must be between -180 and 180.")
+
+def validate_offset(offset):
+    if not isinstance(offset, (int, float)):
+        raise TypeError("Offset must be numeric.")
+    if not (-12 <= offset <= 14):
+        raise ValueError("UTC offset must be between -12 and 14.")
+
+
 def tz_region(latitude: float, longitude: float):
     regions = []
     regions.extend(
@@ -25,6 +41,7 @@ def tz_regions():
     ]
 
 def tz_region_nearest(latitude: float, longitude: float):
+    validate_lat_lon(latitude, longitude)
     min_dist = None
     nearest_region = None
     for name, bounds in TZ_LOCATIONS.items():
@@ -51,6 +68,7 @@ def tz_region_cities(region: str):
     return {"region": region, "cities": cities}
 
 def cities_nearest(latitude: float, longitude: float):
+    validate_lat_lon(latitude, longitude)
     distances = []
     for tz in ALL_TIMEZONES:
         dist = haversine(latitude, longitude, tz["latitude"], tz["longitude"])
@@ -75,6 +93,10 @@ def cities_nearest(latitude: float, longitude: float):
     }
 
 def cities_in_radius(latitude: float, longitude: float, radius_km: float):
+    validate_lat_lon(latitude, longitude)
+    if not isinstance(radius_km, (int, float)) or radius_km < 0:
+        raise ValueError("Radius must be a non-negative number.")
+
     result = []
     for city in ALL_TIMEZONES:
         dist = haversine(latitude, longitude, city["latitude"], city["longitude"])
@@ -86,6 +108,7 @@ def cities_in_radius(latitude: float, longitude: float, radius_km: float):
     return {"cities": result}
 
 def cities_by_utc_offset(offset: float):
+    validate_offset(offset)
     result = []
     for city in ALL_TIMEZONES:
         if float(city.get("utc_offset", 0)) == offset:
@@ -104,6 +127,7 @@ def cities_with_dst(dst: bool = True, region: str = None):
     return {"cities": result}
 
 def city_extremes(offset: float):
+    validate_offset(offset)
     cities = [
         city
         for city in ALL_TIMEZONES
