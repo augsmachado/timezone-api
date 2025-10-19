@@ -160,11 +160,12 @@ def test_load_all_timezones_happy_and_edge_cases(files, expected, description, m
     with patch_path as mock_path:
         # Patch __file__ to simulate the correct parent directory
         monkeypatch.setattr("utils.timezones.__file__", str(mock_tz_dir.parent.parent / "utils" / "timezones.py"))
-        # Patch Path.glob to only return our test files
+        # Patch Path.glob to only return our test files, avoiding recursion
+        original_glob = Path.glob
         monkeypatch.setattr(
             Path,
             "glob",
-            lambda self, pattern: list(mock_tz_dir.glob(pattern)) if self == mock_tz_dir else Path.glob(self, pattern)
+            lambda self, pattern: list(original_glob(self, pattern)) if self != mock_tz_dir else list(original_glob(mock_tz_dir, pattern))
         )
 
         # Act
@@ -217,10 +218,12 @@ def test_load_all_timezones_error_cases(files, error_type, description, mock_tz_
     )
     with patch_path as mock_path:
         monkeypatch.setattr("utils.timezones.__file__", str(mock_tz_dir.parent.parent / "utils" / "timezones.py"))
+        # Patch Path.glob to only return our test files, avoiding recursion
+        original_glob = Path.glob
         monkeypatch.setattr(
             Path,
             "glob",
-            lambda self, pattern: list(mock_tz_dir.glob(pattern)) if self == mock_tz_dir else Path.glob(self, pattern)
+            lambda self, pattern: list(original_glob(self, pattern)) if self != mock_tz_dir else list(original_glob(mock_tz_dir, pattern))
         )
 
         # Act & Assert
